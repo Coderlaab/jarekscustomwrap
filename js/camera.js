@@ -119,5 +119,5 @@ export function framingBias(p, W, H){
   const ease = t => t*t*(3-2*t);
   const seg  = (x,a,b) => sat((x-a)/(b-a));
   const tall = sat((1.10 - W/H) * 1.25);
-  return 0.235 * tall + 0.250 * ease(seg(p, C6, 0.99));
+  return 0.235 * tall + 0.335 * ease(seg(p, C6, 0.99));
 }

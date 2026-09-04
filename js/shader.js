@@ -112,36 +112,70 @@ float ppfEdge(vec3 p){
   return exp(-pow(abs(p.x - f)*6.5, 2.0)) * on;
 }
 
-// Colour transformation front: sweeps tail -> nose across chapter 5.
+// Colour transformation. Each entry in the palette gets its own front, sweeping
+// tail -> nose exactly as the two original fronts did: same easing, same span,
+// same soft edge. The fronts are staggered but overlap by about 2.4x, so one
+// colour is still arriving as the next sets off and the body never steps.
+const int   NCOL  = 15;
+const float CJ0   = 0.553;                        // = C4, transformation opens
+const float CJ1   = 0.855;                        // settled before the brand beat
+const float CSTEP = (CJ1 - CJ0) / float(NCOL);
+const float CDUR  = CSTEP * 2.4;                  // overlap
+
+// Premium automotive/wrap tones, as linear reflectance for the clearcoat.
+const vec3 CPAL[15] = vec3[15](
+  vec3(0.780, 0.782, 0.790),   // gloss white
+  vec3(0.300, 0.306, 0.322),   // silver metallic
+  vec3(0.520, 0.030, 0.018),   // racing red
+  vec3(0.185, 0.015, 0.011),   // deep red
+  vec3(0.230, 0.020, 0.075),   // burgundy
+  vec3(0.110, 0.030, 0.180),   // purple
+  vec3(0.014, 0.028, 0.092),   // dark blue
+  vec3(0.030, 0.110, 0.420),   // vivid blue
+  vec3(0.011, 0.095, 0.062),   // emerald / jade
+  vec3(0.014, 0.042, 0.026),   // dark green
+  vec3(0.640, 0.470, 0.030),   // yellow
+  vec3(0.620, 0.180, 0.020),   // orange
+  vec3(0.290, 0.120, 0.045),   // bronze / copper
+  vec3(0.430, 0.370, 0.280),   // champagne metallic
+  vec3(0.032, 0.034, 0.040)    // satin graphite — the finish it settles on
+);
+
+// A front that has already swept clean off the nose is just the colour it left
+// behind, and one that has not set off contributes nothing. Only the handful
+// still crossing the body are worth evaluating, which keeps this the same cost
+// per pixel as the two hard-coded fronts it replaces.
+int colFirst(){
+  return clamp(int(floor((uP - CJ0 - CDUR) / CSTEP)) + 1, 0, NCOL);
+}
+
 vec3 paintColour(vec3 p){
-  vec3 raven  = vec3(0.020, 0.021, 0.026);   // near-black clearcoat
-  vec3 ember  = vec3(0.245, 0.021, 0.013);   // deep red
-  vec3 jade   = vec3(0.011, 0.058, 0.041);   // british racing / emerald
-  vec3 satin  = vec3(0.032, 0.034, 0.040);   // satin graphite
-
-  float t1 = easeIO(seg(uP, C4, C4 + 0.070));
-  float t2 = easeIO(seg(uP, C4 + 0.060, C5 - 0.010));
-
-  float f1 = mix(-3.4, 3.4, t1);
-  float f2 = mix(-3.4, 3.4, t2);
-
-  vec3 c = raven;
-  c = mix(c, ember, sat((f1 - p.x)*2.2 + 0.5));
-  c = mix(c, jade,  sat((f2 - p.x)*2.2 + 0.5));
-
-  // settle to satin graphite for the final reveal
-  c = mix(c, satin, easeIO(seg(uP, C5, C5 + 0.075)));
+  int first = colFirst();
+  vec3 c = first > 0 ? CPAL[first - 1] : vec3(0.020, 0.021, 0.026);
+  for(int i = 0; i < 4; i++){
+    int k = first + i;
+    if(k >= NCOL) break;
+    float a = CJ0 + float(k) * CSTEP;
+    float t = easeIO(seg(uP, a, a + CDUR));
+    if(t <= 0.0) break;
+    c = mix(c, CPAL[k], sat((mix(-3.4, 3.4, t) - p.x) * 2.2 + 0.5));
+  }
   return c;
 }
+
 float transformEdge(vec3 p){
-  float t1 = easeIO(seg(uP, C4, C4 + 0.070));
-  float t2 = easeIO(seg(uP, C4 + 0.060, C5 - 0.010));
-  float t3 = easeIO(seg(uP, C5, C5 + 0.075));
+  // The bright line that rides each colour front. Unchanged, one per front.
+  int first = colFirst();
   float e = 0.0;
-  e += exp(-pow(abs(p.x - mix(-3.4,3.4,t1))*7.0, 2.0)) * (t1>0.002 && t1<0.998 ? 1.0 : 0.0);
-  e += exp(-pow(abs(p.x - mix(-3.4,3.4,t2))*7.0, 2.0)) * (t2>0.002 && t2<0.998 ? 1.0 : 0.0);
-  e += exp(-pow(abs(p.x - mix(-3.4,3.4,t3))*7.0, 2.0)) * (t3>0.002 && t3<0.998 ? 1.0 : 0.0);
-  return e;
+  for(int i = 0; i < 4; i++){
+    int k = first + i;
+    if(k >= NCOL) break;
+    float a = CJ0 + float(k) * CSTEP;
+    float t = easeIO(seg(uP, a, a + CDUR));
+    if(t <= 0.0) break;
+    if(t < 0.998) e += exp(-pow(abs(p.x - mix(-3.4, 3.4, t)) * 7.0, 2.0));
+  }
+  return min(e, 1.6);
 }
 
 // ---------------------------------------------------------------- the vehicle
@@ -290,8 +324,8 @@ vec3 shade(vec3 p, vec3 n, vec3 rd, float mid, float pxSpread, float foot){
   // --- glazing ----------------------------------------------------------
   else if(mid < 2.5){
     vec3 r = reflect(rd, n);
-    vec3 spec = env(r, 0.010 + pxSpread);
-    col = spec * (0.055 + 0.945*fres) * 1.05;
+    vec3 spec = env(r, 0.045 + pxSpread);
+    col = spec * (0.055 + 0.945*fres) * 0.92;
     col += vec3(0.0026,0.0030,0.0050);
     float edge = ppfEdge(p);
     col += vec3(0.88,0.92,1.0) * edge * 1.4;
@@ -364,7 +398,7 @@ void main(){
   // down — hard on a tall phone, and harder still at the brand beat where the
   // wordmark needs the whole top of the frame.
   float tall = sat((1.10 - uRes.x/uRes.y) * 1.25);
-  uv.y += 0.235 * tall + 0.250 * ease(seg(uP, C6, 0.99));
+  uv.y += 0.235 * tall + 0.335 * ease(seg(uP, C6, 0.99));
 
   vec3 fwd = normalize(uCamTa - uCamRo);
   vec3 rgt = normalize(cross(fwd, vec3(0.0,1.0,0.0)));

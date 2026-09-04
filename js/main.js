@@ -141,7 +141,9 @@ class Experience {
     this.bars.style.setProperty('--lb', (lb * 5.4).toFixed(3) + 'vh');
 
     // scroll hint
-    this.hint.style.opacity = ((1 - ease(seg(p, 0.004, 0.045))) * alive).toFixed(3);
+    // Hold the cue long enough to be read, then retire it as soon as the
+    // visitor is clearly moving. Full opacity until 1.5% in, gone by 9%.
+    this.hint.style.opacity = ((1 - ease(seg(p, 0.015, 0.090))) * alive).toFixed(3);
 
     // progress rule
     this.progress.style.setProperty('--w', (p*100).toFixed(2) + '%');
