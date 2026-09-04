@@ -22,27 +22,46 @@ const T = [
 const F = [40.0, 44.0, 50.0, 58.0, 62.0, 52.0, 42.0, 38.0];
 const K = [0.0, C1, C2, C3, C4, C5, C6, 1.0];
 
+// Portrait framing multipliers, one per keyframe.
+//
+// Framing is normalised on WIDTH and the FOV above is horizontal, so the
+// vertical world in frame is (height/width) x that. A 16:9 desktop sees 0.625
+// of it; a 390x844 phone sees 2.164 — about 3.5x more. Left alone that turns
+// every macro chapter into a wide shot and strands the wide chapters in dead
+// space. These tighten each keyframe back to the composition it was cut for:
+// the close beats hardest, the two hero-wide beats barely at all so the whole
+// car still fits.
+const FP = [0.88, 0.86, 0.74, 0.56, 0.56, 0.68, 0.88, 0.90];
+
 const sat = x => Math.min(1, Math.max(0, x));
 const easeIO = t => t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;
 const mix3 = (a, b, t) => [a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t, a[2]+(b[2]-a[2])*t];
 
-export function camAt(p, time, px, py){
-  let ro = P[7].slice(), ta = T[7].slice(), fov = F[7];
+export function camAt(p, time, px, py, aspect){
+  let ro = P[7].slice(), ta = T[7].slice(), fov = F[7], fp = FP[7];
   for(let i = 0; i < 7; i++){
     if(p <= K[i+1] || i === 6){
       const t = easeIO(sat((p - K[i]) / Math.max(K[i+1] - K[i], 1e-4)));
       ro = mix3(P[i], P[i+1], t);
       ta = mix3(T[i], T[i+1], t);
       fov = F[i] + (F[i+1] - F[i]) * t;
+      fp  = FP[i] + (FP[i+1] - FP[i]) * t;
       break;
     }
   }
+
+  // How portrait the screen is: 0 at 1.10 and wider, 1 at 0.55 and narrower.
+  // Every landscape desktop lands on 0, so nothing below this line changes it.
+  const port = aspect === undefined ? 0 : sat((1.10 - aspect) / 0.55);
+  fov *= 1 + (fp - 1) * port;
 
   // Living camera: a slow breath plus pointer parallax, so a stopped scroll
   // settles rather than freezing.
   const br = time * 0.16;
   const d = Math.hypot(ro[0]-ta[0], ro[1]-ta[1], ro[2]-ta[2]);
-  const amp = 0.35 + 0.65 * sat(d / 4.0);
+  // Parallax is reduced on a phone: the drift is a mouse affordance, and on a
+  // narrow frame the same amplitude reads as the camera wobbling.
+  const amp = (0.35 + 0.65 * sat(d / 4.0)) * (1 - 0.45 * port);
   ro[0] += Math.sin(br)*0.042*amp;      ro[1] += Math.cos(br*0.83)*0.026*amp;
   ro[2] += Math.sin(br*0.62)*0.036*amp;
   ro[0] += px * 0.15 * amp;             ro[1] += py * 0.10 * amp;

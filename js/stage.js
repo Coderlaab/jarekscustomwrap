@@ -171,7 +171,8 @@ export class Stage {
     const gl = this.gl, u = this.u;
     this._adapt(dt);
 
-    const cam  = camAt(state.p, state.time, state.px, state.py);
+    const cam  = camAt(state.p, state.time, state.px, state.py,
+                       this.canvas.width / this.canvas.height);
     const bias = framingBias(state.p, this.canvas.width, this.canvas.height);
 
     this._gbufferPass(this.fbo[0], cam, bias, false);

@@ -70,8 +70,18 @@ class Experience {
   measure(){
     // 6.5 viewport heights of scroll drives the cinematic, plus one pinned
     // viewport so the last frame can be held.
-    this.cineLength = innerHeight * 6.5;
-    this.track.style.height = (this.cineLength + innerHeight) + 'px';
+    //
+    // The reference height is captured once per orientation and NOT updated on
+    // height-only resizes. On mobile Safari the URL bar collapses as you scroll,
+    // which fires resize and changes innerHeight by ~13%. Recomputing here would
+    // rescale the timeline underneath the scroll position and the cinematic
+    // would lurch backwards mid-gesture. A width change is a real rotation, so
+    // that does re-measure.
+    if(this.baseW === innerWidth && this.cineLength) return;
+    this.baseW = innerWidth;
+    this.baseH = innerHeight;
+    this.cineLength = this.baseH * 6.5;
+    this.track.style.height = (this.cineLength + this.baseH) + 'px';
   }
 
   onScroll(){
@@ -118,8 +128,8 @@ class Experience {
     // Everything in the cinematic layer retires as the site arrives. Without
     // this the brand cue would sit over the real page for ever.
     const past   = scrollY - this.cineLength;
-    const over   = clamp(past / (innerHeight * 0.9), 0, 1);
-    const alive  = 1 - ease(clamp(past / (innerHeight * 0.35), 0, 1));
+    const over   = clamp(past / (this.baseH * 0.9), 0, 1);
+    const alive  = 1 - ease(clamp(past / (this.baseH * 0.35), 0, 1));
 
     // typographic cues
     for(const cue of this.cues){
