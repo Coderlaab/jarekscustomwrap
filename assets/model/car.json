@@ -1,0 +1,62 @@
+{
+ "vertices": 241559,
+ "triangles": 361020,
+ "indexType": "uint32",
+ "layout": {
+  "position": {
+   "offset": 0,
+   "bytes": 2898708,
+   "type": "float32x3"
+  },
+  "normal": {
+   "offset": 2898708,
+   "bytes": 966236,
+   "type": "int8x4_normalized"
+  },
+  "matId": {
+   "offset": 3864944,
+   "bytes": 241559,
+   "type": "uint8"
+  },
+  "indices": {
+   "offset": 4106504,
+   "bytes": 4332240
+  }
+ },
+ "transform": {
+  "note": "glTF -> shader frame: rot +90 about Y, then scale+translate",
+  "scale": 1.378,
+  "translate": [
+   0.0915,
+   -0.0368,
+   0.0
+  ],
+  "map": "x=z*s+tx, y=y*s+ty, z=-x*s"
+ },
+ "bounds": {
+  "min": [
+   -2.0895512104034424,
+   -7.401026232400909e-05,
+   -0.9293161630630493
+  ],
+  "max": [
+   2.0898871421813965,
+   1.1890267133712769,
+   0.9293161630630493
+  ]
+ },
+ "materials": {
+  "1": "paint",
+  "2": "glass",
+  "3": "rubber/trim",
+  "4": "rim",
+  "5": "lights",
+  "6": "caliper"
+ },
+ "source": {
+  "author": "let's not care abt it (https://sketchfab.com/Pie-The-destroyer-of-the-World)",
+  "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+  "source": "https://sketchfab.com/3d-models/porsche-911-turbo-s-992-wip-b0a77bb9395548aabcfe51b2ca476b8b",
+  "title": "Porsche 911 Turbo s 992 (WIP)"
+ }
+}

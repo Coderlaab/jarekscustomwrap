@@ -1,0 +1,20 @@
+{
+  "_": "Cinematic asset manifest. type:'none' = run fully procedurally.",
+  "_activate": "Set type to 'frames' or 'video'. See assets/README.md.",
+
+  "type": "none",
+
+  "_frames_example": {
+    "type": "frames",
+    "path": "assets/seq/",
+    "pattern": "frame_{n}.webp",
+    "start": 1,
+    "count": 420,
+    "pad": 4
+  },
+  "_video_example": {
+    "type": "video",
+    "src": "assets/master.mp4",
+    "duration": 35
+  }
+}

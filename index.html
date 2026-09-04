@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jarek's Custom Wrap — Protect. Transform. Perfect.</title>
+<meta name="description" content="Paint protection film, colour wrapping and finishing, executed to a standard you can see from across the room.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2305060a'/%3E%3Ctext x='16' y='22' font-family='system-ui,sans-serif' font-size='16' font-weight='600' fill='%23a99cff' text-anchor='middle'%3EJ%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,200;6..72,300;6..72,400&display=swap">
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+
+<!-- ===================== cinematic stage (never cuts) ===================== -->
+<div id="stage">
+  <!-- Supplied cinematic footage, when present. Scrubbed by scroll, never played. -->
+  <div id="plate" aria-hidden="true"></div>
+  <canvas id="gl"></canvas>
+  <div id="fallback" aria-hidden="true"></div>
+  <div id="bars" aria-hidden="true"><i class="bar t"></i><i class="bar b"></i></div>
+</div>
+
+<!-- ===================== real HTML typography layer ====================== -->
+<div id="type" aria-hidden="false">
+
+  <div class="cue" data-in="0.012" data-out="0.128" data-fade="0.028">
+    <p class="kicker">Est. Norway</p>
+    <h2 class="line">Crafted differently.</h2>
+  </div>
+
+  <div class="cue" data-in="0.285" data-out="0.392" data-fade="0.026">
+    <h2 class="line">Precision.</h2>
+    <p class="sub">Measured in microns, not millimetres.</p>
+  </div>
+
+  <div class="cue" data-in="0.418" data-out="0.548" data-fade="0.026">
+    <h2 class="line">Protection.</h2>
+    <p class="sub">Self-healing film, laid edge to edge.</p>
+  </div>
+
+  <div class="cue" data-in="0.578" data-out="0.706" data-fade="0.026">
+    <h2 class="line">Transformation.</h2>
+    <p class="sub">A finish that was never on the options list.</p>
+  </div>
+
+  <div class="cue brand" data-in="0.884" data-out="1.02" data-fade="0.040">
+    <h1 class="wordmark"><span>Jarek's</span> Custom Wrap</h1>
+    <p class="tagline">Protect<i>.</i> Transform<i>.</i> Perfect<i>.</i></p>
+    <a class="cta" href="#projects" data-scroll-to="#projects">
+      <span>Explore our work</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M12 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+
+</div>
+
+<div id="hint" aria-hidden="true"><i></i><span>Scroll</span></div>
+<div id="progress" aria-hidden="true"><i></i></div>
+
+<!-- ===================== navigation ====================== -->
+<header id="nav">
+  <a class="mark" href="#top">JAREK'S</a>
+  <nav>
+    <a href="#ppf"      data-scroll-to="#ppf">PPF</a>
+    <a href="#wrapping" data-scroll-to="#wrapping">Wrapping</a>
+    <a href="#projects" data-scroll-to="#projects">Projects</a>
+    <a href="#about"    data-scroll-to="#about">About</a>
+    <a href="#contact"  data-scroll-to="#contact" class="pill">Contact</a>
+  </nav>
+</header>
+
+<!-- ===================== scroll driver ====================== -->
+<div id="track" aria-hidden="true"></div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     LOCKED COMPONENT 01 — CINEMATIC HERO ends here.
+     Everything above this line is the restored hero implementation and is not
+     to be modified. Everything below is the homepage, adapted to sit under it.
+     ══════════════════════════════════════════════════════════════════════════ -->
+
+<main id="site">
+
+
+<!-- ─────────────── 02 · BRAND ─────────────── -->
+<section class="s-brand" id="about">
+  <div class="wrap">
+    <p class="mark-line" data-reveal>
+      <i>01</i><span data-no="Om oss" data-en="About">Om oss</span>
+    </p>
+    <h2 class="statement" data-reveal
+        data-no="Spesialist i profesjonell bildekor og wrapping."
+        data-en="Specialists in professional vehicle graphics and wrapping.">Spesialist i profesjonell bildekor og wrapping.</h2>
+    <p class="lede" data-reveal
+       data-no="Vi monterer lakkbeskyttelsesfilm på biler der resultatet skal tåle å bli sett på nært hold. Klar film som bevarer lakken slik den er. Farget film som endrer uttrykket og beskytter i samme lag."
+       data-en="We fit paint protection film to cars where the result has to survive being looked at closely. Clear film that keeps the paint exactly as it is. Coloured film that changes the look and protects in the same layer.">Vi monterer lakkbeskyttelsesfilm på biler der resultatet skal tåle å bli sett på nært hold. Klar film som bevarer lakken slik den er. Farget film som endrer uttrykket og beskytter i samme lag.</p>
+  </div>
+</section>
+
+<!-- ─────────────── 03 · CLEAR PPF ─────────────── -->
+<section class="s-clear" id="ppf">
+  <figure class="bleed" data-reveal>
+    <img src="assets/work/12.jpg" alt="" loading="lazy" width="1920" height="1281">
+  </figure>
+
+  <div class="wrap two">
+    <div class="col-a">
+      <p class="mark-line" data-reveal><i>02</i><span data-no="Klar PPF" data-en="Clear PPF">Klar PPF</span></p>
+      <h2 class="head" data-reveal>
+        <span data-no="Behold uttrykket." data-en="Keep the look.">Behold uttrykket.</span>
+        <em data-no="Beskytt lakken." data-en="Protect the paint.">Beskytt lakken.</em>
+      </h2>
+    </div>
+    <div class="col-b">
+      <p class="body" data-reveal
+         data-no="Optisk klar film legges over lakken. Bilen ser ut nøyaktig som før. Forskjellen merkes først når du ser på panelene noen år senere — ingen steinsprut i fronten, ingen vaskeriper i klarlakken."
+         data-en="Optically clear film goes over the paint. The car looks exactly as it did. You notice the difference years later, when you look at the panels — no stone chips across the nose, no wash marks in the clearcoat.">Optisk klar film legges over lakken. Bilen ser ut nøyaktig som før. Forskjellen merkes først når du ser på panelene noen år senere — ingen steinsprut i fronten, ingen vaskeriper i klarlakken.</p>
+
+      <ul class="films" id="clear-list" data-reveal></ul>
+
+      <p class="note" data-reveal
+         data-no="Filmene over er fra Carla's, som vi monterer. Garantitid oppgitt av produsenten."
+         data-en="The films above are from Carla's, which we install. Warranty periods as stated by the manufacturer.">Filmene over er fra Carla's, som vi monterer. Garantitid oppgitt av produsenten.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────── 04 · COLOURED PPF ─────────────── -->
+<section class="s-colour" id="wrapping">
+  <div class="wrap">
+    <p class="mark-line" data-reveal><i>03</i><span data-no="Farget PPF" data-en="Coloured PPF">Farget PPF</span></p>
+    <h2 class="head big" data-reveal>
+      <span data-no="Endre uttrykket." data-en="Change the look.">Endre uttrykket.</span>
+      <em data-no="Beskytt lakken." data-en="Protect the paint.">Beskytt lakken.</em>
+    </h2>
+  </div>
+
+  <div class="shift" data-reveal>
+    <figure><img src="assets/work/01.jpg" alt="" loading="lazy" width="1920" height="1439"></figure>
+    <figure><img src="assets/work/09.jpg" alt="" loading="lazy" width="1920" height="1439"></figure>
+    <figcaption
+      data-no="Samme bil, samme film. Fargeskiftende PPF leser ulikt etter innfallsvinkel og lys."
+      data-en="One car, one film. Colour-shift PPF reads differently with angle and light.">Samme bil, samme film. Fargeskiftende PPF leser ulikt etter innfallsvinkel og lys.</figcaption>
+  </div>
+
+  <div class="wrap two">
+    <div class="col-a">
+      <p class="body" data-reveal
+         data-no="Farget PPF er beskyttelsesfilm, ikke folie. Fargen ligger i kjernen av filmen og ikke i et trykk på toppen, og toppstrøket er ripebestandig. Bilen får ny farge eller finish, og originallakken ligger urørt under."
+         data-en="Coloured PPF is protection film, not vinyl. The colour sits in the core of the film rather than in a print on top, and the top coat is scratch resistant. The car gets a new colour or finish, and the original paint stays untouched underneath.">Farget PPF er beskyttelsesfilm, ikke folie. Fargen ligger i kjernen av filmen og ikke i et trykk på toppen, og toppstrøket er ripebestandig. Bilen får ny farge eller finish, og originallakken ligger urørt under.</p>
+    </div>
+    <div class="col-b">
+      <p class="pull" data-reveal
+         data-no="Du trenger ikke klar film under. Farget PPF beskytter i samme lag."
+         data-en="You do not need clear film underneath. Coloured PPF protects in the same layer.">Du trenger ikke klar film under. Farget PPF beskytter i samme lag.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────── 05 · FILMS, COLOURS, FINISHES ─────────────── -->
+<section class="s-film" id="farger">
+  <div class="wrap">
+    <p class="mark-line" data-reveal><i>04</i><span data-no="Filmer og farger" data-en="Films and colours">Filmer og farger</span></p>
+    <h2 class="head" data-reveal>
+      <span data-no="Overflaten avgjør" data-en="The surface decides">Overflaten avgjør</span>
+      <em data-no="hvordan bilen leses." data-en="how the car reads.">hvordan bilen leses.</em>
+    </h2>
+  </div>
+
+  <div class="film-lab" data-reveal>
+    <div class="film-side">
+      <ul id="film-list"></ul>
+    </div>
+
+    <div class="film-stage" id="film-stage">
+      <div class="film-surface" id="film-surface" data-finish="gloss"></div>
+      <div class="film-sheen" id="film-sheen"></div>
+      <div class="film-read">
+        <span class="idx" id="film-index">01</span>
+        <span class="nm" id="film-name"></span>
+        <span class="mt" id="film-meta"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap film-foot">
+    <p class="note" data-reveal
+       data-no="Utvalget over er et utdrag. Blank, satin og designer finnes i vesentlig flere farger enn vi viser her — vi går gjennom aktuelle filmer sammen med deg, mot bilens lakk og lys."
+       data-en="This is a selection. Gloss, satin and designer run to considerably more colours than we show here — we go through the relevant films with you, against the car's own paint and light.">Utvalget over er et utdrag. Blank, satin og designer finnes i vesentlig flere farger enn vi viser her — vi går gjennom aktuelle filmer sammen med deg, mot bilens lakk og lys.</p>
+    <a class="btn ghost" href="#contact" data-reveal data-no="Finn riktig uttrykk" data-en="Find the right finish">Finn riktig uttrykk</a>
+  </div>
+</section>
+
+<!-- ─────────────── 06 · SELECTED WORK ─────────────── -->
+<section class="s-work" id="projects">
+  <div class="wrap">
+    <p class="mark-line" data-reveal><i>05</i><span data-no="Utvalgte prosjekter" data-en="Selected work">Utvalgte prosjekter</span></p>
+  </div>
+
+  <figure class="w-hero" data-reveal>
+    <img src="assets/work/02.jpg" alt="" loading="lazy" width="1920" height="1281">
+    <figcaption>
+      <b>Tesla Model S</b>
+      <span data-no="Satin grå, med sorte striper over panser og tak" data-en="Satin grey, with black stripes over bonnet and roof">Satin grå, med sorte striper over panser og tak</span>
+    </figcaption>
+  </figure>
+
+  <div class="w-pair">
+    <figure class="tall" data-reveal>
+      <img src="assets/work/05.jpg" alt="" loading="lazy" width="1920" height="1439">
+      <figcaption>
+        <b>Dodge Charger</b>
+        <span data-no="Fargeskiftende film — lilla mot kobber" data-en="Colour-shift film — violet to copper">Fargeskiftende film — lilla mot kobber</span>
+      </figcaption>
+    </figure>
+    <div class="w-aside" data-reveal>
+      <p class="body"
+         data-no="Vi velger film etter bilen, ikke omvendt. Panelenes form, lakkens dybde og hvordan bilen faktisk brukes avgjør hva som fungerer."
+         data-en="We choose the film for the car, not the other way round. Panel shape, the depth of the paint and how the car is actually used decide what works.">Vi velger film etter bilen, ikke omvendt. Panelenes form, lakkens dybde og hvordan bilen faktisk brukes avgjør hva som fungerer.</p>
+    </div>
+  </div>
+
+  <figure class="w-wide" data-reveal>
+    <img src="assets/work/08.jpg" alt="" loading="lazy" width="1920" height="1281">
+    <figcaption>
+      <b>Tesla Model S</b>
+      <span data-no="Satin metallic, full kropp" data-en="Satin metallic, full body">Satin metallic, full kropp</span>
+    </figcaption>
+  </figure>
+
+  <figure class="w-hero offset" data-reveal>
+    <img src="assets/work/03.jpg" alt="" loading="lazy" width="1920" height="1439">
+    <figcaption>
+      <b>Dodge Charger</b>
+      <span data-no="Matt kobber, front og panser" data-en="Matte copper, front end and bonnet">Matt kobber, front og panser</span>
+    </figcaption>
+  </figure>
+</section>
+
+<!-- ─────────────── 07 · CRAFTSMANSHIP ─────────────── -->
+<section class="s-craft" id="handverk">
+  <div class="wrap">
+    <p class="mark-line" data-reveal><i>06</i><span data-no="Håndverk" data-en="Craft">Håndverk</span></p>
+    <h2 class="head" data-reveal>
+      <span data-no="Det avgjøres" data-en="It is decided">Det avgjøres</span>
+      <em data-no="i kantene." data-en="at the edges.">i kantene.</em>
+    </h2>
+  </div>
+
+  <div class="craft-run">
+    <figure data-reveal>
+      <img src="assets/work/06.jpg" alt="" loading="lazy" width="1920" height="1281">
+      <figcaption data-no="Kanten brettes rundt panelet der geometrien tillater det." data-en="The edge is wrapped around the panel wherever the geometry allows.">Kanten brettes rundt panelet der geometrien tillater det.</figcaption>
+    </figure>
+    <figure data-reveal>
+      <img src="assets/work/11.jpg" alt="" loading="lazy" width="1920" height="1281">
+      <figcaption data-no="Hjulbuer legges i ett stykke. Skjøter havner der ingen ser etter." data-en="Arches go on in one piece. Seams land where nobody looks.">Hjulbuer legges i ett stykke. Skjøter havner der ingen ser etter.</figcaption>
+    </figure>
+    <figure data-reveal>
+      <img src="assets/work/07.jpg" alt="" loading="lazy" width="1920" height="1281">
+      <figcaption data-no="Filmen skal ligge dødt mot lakken. Ingen bølger, ingen appelsinhud." data-en="The film has to lie dead flat. No waviness, no orange peel.">Filmen skal ligge dødt mot lakken. Ingen bølger, ingen appelsinhud.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ─────────────── 08 · PROCESS ─────────────── -->
+<section class="s-process">
+  <div class="wrap">
+    <p class="mark-line" data-reveal><i>07</i><span data-no="Slik jobber vi" data-en="How we work">Slik jobber vi</span></p>
+
+    <ol class="steps">
+      <li data-reveal>
+        <i>01</i>
+        <b data-no="Samtale" data-en="Conversation">Samtale</b>
+        <span data-no="Vi ser på bilen, lakken og hva du vil oppnå." data-en="We look at the car, the paint, and what you want from it.">Vi ser på bilen, lakken og hva du vil oppnå.</span>
+      </li>
+      <li data-reveal>
+        <i>02</i>
+        <b data-no="Forberedelse" data-en="Preparation">Forberedelse</b>
+        <span data-no="Vask, dekontaminering og måling. Lakken må være ren før film legges." data-en="Wash, decontamination and measurement. The paint has to be clean before any film goes on.">Vask, dekontaminering og måling. Lakken må være ren før film legges.</span>
+      </li>
+      <li data-reveal>
+        <i>03</i>
+        <b data-no="Montering" data-en="Installation">Montering</b>
+        <span data-no="Filmen legges panel for panel, med kantene brettet der det lar seg gjøre." data-en="The film goes on panel by panel, edges wrapped wherever it can be done.">Filmen legges panel for panel, med kantene brettet der det lar seg gjøre.</span>
+      </li>
+      <li data-reveal>
+        <i>04</i>
+        <b data-no="Overlevering" data-en="Handover">Overlevering</b>
+        <span data-no="Bilen kontrolleres i hardt lys før du henter den." data-en="The car is checked under hard light before you collect it.">Bilen kontrolleres i hardt lys før du henter den.</span>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ─────────────── 09 · CONTACT ─────────────── -->
+<section class="s-contact" id="contact">
+  <div class="wrap two">
+    <div class="col-a">
+      <p class="mark-line" data-reveal><i>08</i><span data-no="Kontakt" data-en="Contact">Kontakt</span></p>
+      <h2 class="head big" data-reveal>
+        <span data-no="Ta med bilen." data-en="Bring us the car.">Ta med bilen.</span>
+      </h2>
+      <p class="body" data-reveal
+         data-no="Fortell oss hva bilen er og hva du ser for deg. Vi sier ærlig hva som er verdt å gjøre."
+         data-en="Tell us what the car is and what you have in mind. We will tell you honestly what is worth doing.">Fortell oss hva bilen er og hva du ser for deg. Vi sier ærlig hva som er verdt å gjøre.</p>
+
+      <ul class="direct" data-reveal>
+        <li><span data-no="Telefon" data-en="Phone">Telefon</span><a href="tel:+4746565344">465 65 344</a></li>
+        <li><span data-no="E-post" data-en="Email">E-post</span><a href="mailto:info@jarekscustomwrap.no">info@jarekscustomwrap.no</a></li>
+        <li><span>Instagram</span><a href="https://www.instagram.com/jareks_custom_wrap/" target="_blank" rel="noopener">@jareks_custom_wrap</a></li>
+      </ul>
+    </div>
+
+    <div class="col-b">
+      <form id="quote" data-reveal novalidate>
+        <div class="f-row">
+          <label for="q-navn" data-no="Navn" data-en="Name">Navn</label>
+          <input id="q-navn" name="navn" type="text" required autocomplete="name">
+        </div>
+        <div class="f-row">
+          <label for="q-kontakt" data-no="Telefon eller e-post" data-en="Phone or email">Telefon eller e-post</label>
+          <input id="q-kontakt" name="kontakt" type="text" required autocomplete="tel">
+        </div>
+        <div class="f-row">
+          <label for="q-bil" data-no="Bil" data-en="Vehicle">Bil</label>
+          <input id="q-bil" name="bil" type="text"
+                 data-ph-no="Merke og modell" data-ph-en="Make and model" placeholder="Merke og modell">
+        </div>
+
+        <fieldset class="f-choice">
+          <legend data-no="Hva er du ute etter?" data-en="What are you after?">Hva er du ute etter?</legend>
+          <label><input type="radio" name="type" value="klar" checked><span data-no="Klar PPF" data-en="Clear PPF">Klar PPF</span></label>
+          <label><input type="radio" name="type" value="farget"><span data-no="Farget PPF" data-en="Coloured PPF">Farget PPF</span></label>
+          <label><input type="radio" name="type" value="usikker"><span data-no="Vet ikke ennå" data-en="Not sure yet">Vet ikke ennå</span></label>
+        </fieldset>
+
+        <div class="f-row">
+          <label for="q-melding" data-no="Melding" data-en="Message">Melding</label>
+          <textarea id="q-melding" name="melding" rows="3"></textarea>
+        </div>
+
+        <button class="btn solid" type="submit" data-no="Send forespørsel" data-en="Send enquiry">Send forespørsel</button>
+        <p class="f-done" data-no="Takk — vi tar kontakt." data-en="Thank you — we will be in touch.">Takk — vi tar kontakt.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+
+<footer id="foot">
+  <div class="wrap">
+    <img class="crest" src="assets/brand/jareks-custom-wrap-logo.png" width="1280" height="624" alt="Jarek's Custom Wrap">
+    <div class="f-links">
+      <a href="tel:+4746565344">465 65 344</a>
+      <a href="mailto:info@jarekscustomwrap.no">info@jarekscustomwrap.no</a>
+      <a href="https://www.instagram.com/jareks_custom_wrap/" target="_blank" rel="noopener">Instagram</a>
+    </div>
+    
+    <div class="lang" role="group" aria-label="Språk / Language">
+      <button type="button" data-lang="no" class="on" aria-pressed="true">NO</button>
+      <span aria-hidden="true">/</span>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+    <p class="f-legal">© <span id="year"></span> Jarek's Custom Wrap</p>
+  </div>
+</footer>
+</main>
+
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+<script type="module" src="js/main.js"></script>
+<script type="module" src="js/homepage.js"></script>
+</body>
+</html>
