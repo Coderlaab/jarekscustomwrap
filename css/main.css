@@ -205,6 +205,21 @@ body.no-webgl #fallback{ display:block; }
 #nav .pill{ border:1px solid var(--rule); border-radius:999px; padding:.6rem 1.2rem;
   color:var(--ink); }
 #nav .pill:hover{ border-color:rgba(169,156,255,.5); }
+#nav .lang{ display:flex; align-items:center; gap:.4rem; font-size:.66rem; letter-spacing:.1em; }
+#nav .lang button{
+  background:none; border:0; padding:.3rem; cursor:pointer; color:var(--ink-faint);
+  font:inherit; letter-spacing:.12em; transition:color .3s;
+}
+#nav .lang button:hover{ color:var(--ink-soft); }
+#nav .lang button.on{ color:var(--ink); }
+#nav .lang span{ color:rgba(242,243,246,.18); }
+
+.skip{
+  position:fixed; top:-100px; left:1rem; z-index:99; padding:.8rem 1.2rem;
+  background:var(--ink); color:var(--void); font-size:.8rem; text-decoration:none;
+}
+.skip:focus{ top:1rem; }
+:focus-visible{ outline:1px solid var(--violet); outline-offset:3px; }
 
 /* ---------------------------------------------------------------- track --- */
 #track{ position:relative; z-index:1; pointer-events:none; }
@@ -271,11 +286,14 @@ body.no-webgl #fallback{ display:block; }
   .brand .tagline{ letter-spacing:.28em; }
   .cta{ --pad:.95rem 1.6rem; font-size:.66rem; letter-spacing:.22em; }
 
-  /* Section links are all reachable by scrolling; on a phone the bar keeps
-     only the mark and the one action worth a tap. */
-  #nav{ padding:1.1rem 1.1rem; }
-  #nav nav a:not(.pill){ display:none; }
-  #nav .mark{ font-size:.7rem; letter-spacing:.2em; }
+  /* Keep every section reachable on a phone. The wordmark goes instead — the
+     brand is unmissable in the hero directly beneath it. */
+  #nav{ padding:1rem .9rem; gap:.6rem; }
+  #nav .mark{ display:none; }
+  #nav nav{ gap:.85rem; }
+  #nav nav a{ font-size:.6rem; letter-spacing:.13em; }
+  #nav .pill{ padding:.5rem .8rem; }
+  #nav .lang{ font-size:.6rem; }
 
   .specs{ gap:2rem 3rem; }
   .swatches i{ width:52px; height:52px; }
@@ -405,14 +423,8 @@ body.no-webgl #fallback{ display:block; }
 #site figcaption span{ color:var(--bone-3); font-family:var(--f-body); font-size:.92rem; font-weight:300; }
 
 /* 02 brand — carries the hero handoff gradient into the first panel */
-#site .s-brand{
-  padding:clamp(7rem,17vh,14rem) 0 clamp(6rem,13vh,11rem);
-  background:linear-gradient(180deg, rgba(6,7,10,.92), var(--ground) 22%);
-}
 
 /* 03 clear ppf */
-#site .s-clear{ padding:0 0 clamp(6rem,13vh,11rem); }
-#site .bleed{ width:100%; height:clamp(340px,62vh,680px); overflow:hidden; margin-bottom:clamp(3.5rem,8vh,7rem); }
 #site .bleed img{ height:100%; }
 #site .films{ list-style:none; margin:2.6rem 0 1.6rem; padding:0; border-top:1px solid var(--hair); }
 #site .films li{
@@ -424,8 +436,6 @@ body.no-webgl #fallback{ display:block; }
 #site .films i{ font-style:normal; font-family:var(--f-mono); font-size:.78rem; color:var(--bone-2); }
 
 /* 04 coloured ppf */
-#site .s-colour{ padding:clamp(5rem,11vh,9rem) 0 clamp(6rem,13vh,11rem); background:var(--surface); }
-#site .shift{ display:grid; grid-template-columns:1fr 1fr; gap:2px; margin:clamp(2.5rem,6vh,4.5rem) 0 clamp(2.5rem,6vh,4rem); }
 #site .shift figure{ height:clamp(300px,54vh,600px); overflow:hidden; }
 #site .shift figcaption{
   grid-column:1 / -1; justify-content:center; text-align:center; margin-top:1.3rem;
@@ -496,7 +506,6 @@ body.no-webgl #fallback{ display:block; }
 
 /* 06 selected work */
 #site .s-work{ padding:clamp(6rem,13vh,11rem) 0; background:var(--surface); }
-#site .w-hero{ width:100%; height:clamp(400px,84vh,860px); overflow:hidden; }
 #site .w-hero img{ height:100%; }
 #site .w-hero figcaption, #site .w-wide figcaption, #site .tall figcaption{ padding:0 var(--gut); }
 #site .w-hero.offset{ margin-top:clamp(4rem,9vh,8rem); }
@@ -510,7 +519,6 @@ body.no-webgl #fallback{ display:block; }
 #site .w-pair .tall figcaption{ padding:0; }
 #site .w-pair .tall img{ height:100%; }
 #site .w-aside .body{ max-width:32ch; }
-#site .w-wide{ width:100%; height:clamp(340px,66vh,700px); overflow:hidden; margin-top:clamp(4rem,9vh,8rem); }
 #site .w-wide img{ height:100%; }
 
 /* 07 craft */
@@ -522,7 +530,6 @@ body.no-webgl #fallback{ display:block; }
 @media (max-width:860px){ #site .craft-run{ grid-template-columns:1fr; } }
 #site .craft-run figure{ display:flex; flex-direction:column; }
 #site .craft-run figure:nth-child(2){ margin-top:clamp(2rem,7vh,5rem); }
-#site .craft-run img{ aspect-ratio:4/5; }
 #site .craft-run figcaption{
   font-family:var(--f-body); font-weight:300; font-size:.98rem; line-height:1.6;
   color:var(--bone-2); max-width:32ch;
@@ -596,12 +603,114 @@ body.no-webgl #fallback{ display:block; }
 #site .f-links a:hover{ color:var(--bone); border-bottom-color:var(--hair); }
 #site .f-legal{ margin:0; font-family:var(--f-mono); font-size:.68rem; color:var(--bone-4); }
 
-/* language control — lives in the footer while the hero's nav stays untouched */
-#site .lang{ display:flex; align-items:center; gap:.4rem; font-family:var(--f-mono); font-size:.68rem; }
-#site .lang button{
-  background:none; border:0; padding:.25rem; cursor:pointer; color:var(--bone-3);
-  font:inherit; letter-spacing:.12em; transition:color .3s;
+
+
+
+/* ==========================================================================
+   CHAPTERS 02-08 — additions and replacements
+   ========================================================================== */
+
+/* ---- 02 · the correction ------------------------------------------------ */
+/* No diagram and no claim: the right column simply has one more line, and that
+   line is the only text at full strength. The design is the comparison. */
+#site .s-correct{ position:relative; padding:clamp(7rem,17vh,13rem) 0 clamp(6rem,14vh,11rem); overflow:hidden; }
+#site .cx-surface{
+  position:absolute; inset:0; z-index:0; pointer-events:none;
+  background:url("../assets/film/frozen-leaden-gray.webp") center/cover no-repeat;
+  opacity:.22; filter:saturate(.55) contrast(1.05);
 }
-#site .lang button:hover{ color:var(--bone-2); }
-#site .lang button.on{ color:var(--bone); }
-#site .lang span{ color:var(--bone-4); }
+#site .s-correct::after{
+  content:""; position:absolute; inset:0; z-index:1; pointer-events:none;
+  background:
+    radial-gradient(120% 80% at 50% 40%, rgba(6,7,10,.30), rgba(6,7,10,.92) 78%),
+    linear-gradient(180deg, var(--ground), rgba(6,7,10,0) 22%, rgba(6,7,10,0) 78%, var(--ground));
+}
+#site .s-correct .wrap{ position:relative; z-index:2; }
+#site .s-correct .lede{ margin-top:1.6rem; }
+
+#site .cx{
+  display:grid; grid-template-columns:1fr 1px 1fr; gap:0 clamp(1.6rem,5vw,4.5rem);
+  margin-top:clamp(3rem,8vh,5.5rem); max-width:760px;
+}
+#site .cx-rule{ background:var(--hair); display:block; }
+#site .cx-col h3{
+  margin:0 0 1.2rem; font-family:var(--f-mono); font-size:.66rem; font-weight:400;
+  letter-spacing:.24em; text-transform:uppercase; color:var(--bone-3);
+}
+#site .cx-col p{
+  margin:0 0 .45rem; font-size:clamp(1.05rem,2.1vw,1.5rem); font-weight:500;
+  letter-spacing:-.018em; line-height:1.3; color:var(--bone-3);
+}
+#site .cx-hit{ color:var(--bone) !important; position:relative; }
+#site .cx-hit::before{
+  content:""; position:absolute; left:-1rem; top:.62em; width:5px; height:5px;
+  background:var(--accent);
+}
+/* the one delayed line — it arrives last and does the whole job */
+#site .cx-hit[data-reveal]{ transition-delay:.18s; }
+
+@media (max-width:680px){
+  #site .cx{ grid-template-columns:1fr; gap:0; max-width:none; }
+  #site .cx-rule{ width:100%; height:1px; margin:1.6rem 0; }
+  #site .cx-col p{ font-size:1.18rem; }
+  /* both blocks must be readable in one screen — the comparison is the point */
+  #site .s-correct{ padding:clamp(4.5rem,11vh,7rem) 0 clamp(4rem,10vh,6rem); }
+  #site .s-correct .lede{ margin-top:1.1rem; }
+  #site .cx{ margin-top:2.2rem; }
+}
+
+/* ---- 03 · preserve or transform ----------------------------------------- */
+#site .s-paths{ padding:clamp(6rem,14vh,11rem) 0 clamp(5rem,12vh,9rem); background:var(--surface); }
+#site .path{ position:relative; margin-top:clamp(3rem,8vh,6rem); padding:clamp(3rem,8vh,5.5rem) 0; }
+#site .path-surface{
+  position:absolute; inset:0; z-index:0; pointer-events:none; background-size:cover;
+  background-position:center; opacity:.30;
+}
+#site .path-keep{ background-image:url("../assets/film/super-black.webp"); }
+#site .path-change{ background-image:url("../assets/film/marina-bay-blue.webp"); opacity:.36; }
+#site .path::after{
+  content:""; position:absolute; inset:0; z-index:1; pointer-events:none;
+  background:linear-gradient(90deg, rgba(10,12,16,.96) 30%, rgba(10,12,16,.55));
+}
+#site .path .wrap{ position:relative; z-index:2; }
+#site .path-tag{
+  margin:0 0 1rem; font-family:var(--f-mono); font-size:.64rem; letter-spacing:.22em;
+  text-transform:uppercase; color:var(--keep, #7fd4e8);
+}
+#site .path-tag.alt{ color:var(--accent); }
+#site .path .head{ font-size:clamp(1.6rem,3.4vw,2.9rem); }
+#site .path .body{ margin-bottom:0; }
+#site .path .pull{ margin-top:1.8rem; }
+
+/* ---- 05 / 06 · placeholders --------------------------------------------- */
+/* Explicit internal slots. Nothing here pretends to be Jarek's work. */
+#site .ph{
+  position:relative; display:flex; align-items:flex-end; justify-content:flex-start;
+  background:
+    repeating-linear-gradient(-45deg, rgba(239,237,232,.022) 0 2px, transparent 2px 11px),
+    linear-gradient(180deg, #0d1016, #090b10);
+  border:1px solid var(--hair);
+}
+#site .ph .ph-tag{
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  font-family:var(--f-mono); font-size:.62rem; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--bone-4); white-space:nowrap; padding:.5rem .9rem; border:1px solid var(--hair);
+}
+#site .ph-hero{ width:100%; aspect-ratio:16/9; }
+#site .ph-wide{ width:100%; aspect-ratio:21/9; margin-top:clamp(3rem,8vh,6rem); }
+#site .ph-tall{ width:100%; aspect-ratio:3/4; }
+#site .ph-4x5{ width:100%; aspect-ratio:4/5; }
+#site .craft-run .ph{ display:block; }
+#site .craft-run figcaption{ margin-top:1.1rem; }
+
+#site .s-work{ padding:clamp(6rem,14vh,11rem) 0; background:var(--ground); }
+#site .s-work .wrap{ margin-bottom:clamp(2.5rem,6vh,4rem); }
+
+/* ---- 06 · craft ---------------------------------------------------------- */
+#site .s-craft{ padding:clamp(6rem,14vh,11rem) 0; background:var(--surface); }
+#site .s-craft .lede{ margin-top:1.6rem; }
+
+@media (max-width:860px){
+  #site .ph-wide{ aspect-ratio:16/9; }
+  #site .ph-hero{ aspect-ratio:4/3; }
+}

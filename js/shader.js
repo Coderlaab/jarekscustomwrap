@@ -113,46 +113,38 @@ float ppfEdge(vec3 p){
 }
 
 // Colour transformation. Each entry in the palette gets its own front, sweeping
-// tail -> nose exactly as the two original fronts did: same easing, same span,
-// same soft edge. The fronts are staggered but overlap by about 2.4x, so one
-// colour is still arriving as the next sets off and the body never steps.
-const int   NCOL  = 15;
+// tail -> nose exactly as the original two fronts did: same easing, same span,
+// same soft edge. Only the schedule changed.
+//
+// The fronts no longer overlap. CDUR is 45% of CSTEP, so each sweep completes
+// and then NOTHING happens for the remaining 55% — the finished colour simply
+// sits on the car and is seen before the next front sets off. Under the old
+// 2.4x overlap there were always ~2.4 fronts in flight and settle time was
+// structurally zero.
+const int   NCOL  = 4;
 const float CJ0   = 0.553;                        // = C4, transformation opens
-const float CJ1   = 0.855;                        // settled before the brand beat
-const float CSTEP = (CJ1 - CJ0) / float(NCOL);
-const float CDUR  = CSTEP * 2.4;                  // overlap
+const float CJ1   = 0.860;                        // settled before the brand beat
+const float CSTEP = (CJ1 - CJ0) / float(NCOL);    // one slot per colour
+const float CDUR  = CSTEP * 0.45;                 // sweep 45%, hold 55%
 
-// Premium automotive/wrap tones, as linear reflectance for the clearcoat.
-const vec3 CPAL[15] = vec3[15](
-  vec3(0.780, 0.782, 0.790),   // gloss white
-  vec3(0.300, 0.306, 0.322),   // silver metallic
+// Four premium finishes, as linear reflectance for the clearcoat. The larger
+// library lives in the material chapter further down the page.
+const vec3 CPAL[4] = vec3[4](
   vec3(0.520, 0.030, 0.018),   // racing red
-  vec3(0.185, 0.015, 0.011),   // deep red
-  vec3(0.230, 0.020, 0.075),   // burgundy
-  vec3(0.110, 0.030, 0.180),   // purple
-  vec3(0.014, 0.028, 0.092),   // dark blue
   vec3(0.030, 0.110, 0.420),   // vivid blue
-  vec3(0.011, 0.095, 0.062),   // emerald / jade
-  vec3(0.014, 0.042, 0.026),   // dark green
-  vec3(0.640, 0.470, 0.030),   // yellow
-  vec3(0.620, 0.180, 0.020),   // orange
-  vec3(0.290, 0.120, 0.045),   // bronze / copper
-  vec3(0.430, 0.370, 0.280),   // champagne metallic
+  vec3(0.011, 0.095, 0.062),   // emerald jade
   vec3(0.032, 0.034, 0.040)    // satin graphite — the finish it settles on
 );
 
-// A front that has already swept clean off the nose is just the colour it left
-// behind, and one that has not set off contributes nothing. Only the handful
-// still crossing the body are worth evaluating, which keeps this the same cost
-// per pixel as the two hard-coded fronts it replaces.
+// With no overlap at most one front is ever in flight, so the window is two.
 int colFirst(){
   return clamp(int(floor((uP - CJ0 - CDUR) / CSTEP)) + 1, 0, NCOL);
 }
 
 vec3 paintColour(vec3 p){
   int first = colFirst();
-  vec3 c = first > 0 ? CPAL[first - 1] : vec3(0.020, 0.021, 0.026);
-  for(int i = 0; i < 4; i++){
+  vec3 c = first > 0 ? CPAL[first - 1] : vec3(0.020, 0.021, 0.026);   // near-black
+  for(int i = 0; i < 2; i++){
     int k = first + i;
     if(k >= NCOL) break;
     float a = CJ0 + float(k) * CSTEP;
@@ -167,7 +159,7 @@ float transformEdge(vec3 p){
   // The bright line that rides each colour front. Unchanged, one per front.
   int first = colFirst();
   float e = 0.0;
-  for(int i = 0; i < 4; i++){
+  for(int i = 0; i < 2; i++){
     int k = first + i;
     if(k >= NCOL) break;
     float a = CJ0 + float(k) * CSTEP;

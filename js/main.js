@@ -18,6 +18,19 @@ const CH = {                       // chapter boundaries on the 0..1 master
   brand:     [0.868, 1.000]
 };
 
+// --- playback -------------------------------------------------------------
+// The cinematic runs on a clock, not on scroll position. Scroll expresses
+// forward intent and may accelerate that clock; it can never set the frame.
+// That is what stops a flick throwing the film through several beats at once,
+// and it removes the catch-up glide, because the timeline no longer has a
+// distant target to chase.
+const DUR_S       = 16.0;   // passive viewing duration of the whole arc
+const RATE        = 1 / DUR_S;
+const MAX_MULT    = 2.5;    // the most that scrolling may accelerate playback
+const SKIP_MULT   = 8.0;    // once the visitor has clearly left the hero
+const ENERGY_FULL = 900;    // px of recent scrolling that means "full speed"
+const ENERGY_TAU  = 0.45;   // seconds; how fast that intent decays
+
 const clamp = (v,a,b) => Math.min(b, Math.max(a, v));
 const lerp  = (a,b,t) => a + (b-a)*t;
 const seg   = (p,a,b) => clamp((p-a)/(b-a), 0, 1);
@@ -41,7 +54,7 @@ class Experience {
     this.progress = document.getElementById('progress');
     this.bars     = document.getElementById('bars');
 
-    this.p = 0; this.target = 0; this.vel = 0;
+    this.p = 0; this.vel = 0; this.energy = 0; this.lastY = 0;
     this.px = 0; this.py = 0; this.tpx = 0; this.tpy = 0;
     this.last = performance.now();
 
@@ -63,6 +76,11 @@ class Experience {
       });
     });
 
+    // Returning from a background tab must not advance the film by the time
+    // spent away.
+    document.addEventListener('visibilitychange', () => { this.last = performance.now(); });
+
+    if(reduced) this.p = 1;          // finished hero state, no cinematic played
     this.onScroll();
     requestAnimationFrame(t => this.frame(t));
   }
@@ -80,25 +98,33 @@ class Experience {
     if(this.baseW === innerWidth && this.cineLength) return;
     this.baseW = innerWidth;
     this.baseH = innerHeight;
-    this.cineLength = this.baseH * 6.5;
+    this.cineLength = this.baseH * 1.6;
     this.track.style.height = (this.cineLength + this.baseH) + 'px';
   }
 
   onScroll(){
-    this.target = clamp(scrollY / this.cineLength, 0, 1);
+    // Scroll contributes energy, not position. Distance travelled is intent.
+    this.energy += Math.abs(scrollY - this.lastY);
+    this.lastY = scrollY;
   }
 
   frame(now){
-    const dt = Math.min(now - this.last, 50);
+    const dts = Math.min((now - this.last) / 1000, 0.05);   // seconds, clamped
+    const dt  = dts * 1000;
     this.last = now;
-
-    // Critically-damped-ish follow. Frame-rate independent.
-    const k = reduced ? 1 : 1 - Math.pow(0.0016, dt / 1000);
     const prev = this.p;
-    this.p += (this.target - this.p) * k;
-    if(Math.abs(this.target - this.p) < 0.00004) this.p = this.target;
 
-    this.vel = lerp(this.vel, (this.p - prev) * (1000/Math.max(dt,1)) * 0.016, 0.2);
+    if(!reduced && this.p < 1){
+      this.energy *= Math.exp(-dts / ENERGY_TAU);
+      const intent = clamp(this.energy / ENERGY_FULL, 0, 1);
+      // Past the pinned track the visitor has plainly moved on, so the film
+      // fast-forwards to its end rather than being abandoned mid-shot.
+      const mult = (scrollY - this.cineLength) > 0
+                 ? SKIP_MULT : 1 + intent * (MAX_MULT - 1);
+      this.p = Math.min(1, this.p + RATE * mult * dts);
+    }
+
+    this.vel = lerp(this.vel, (this.p - prev) / Math.max(dts, 1e-3) * 0.016, 0.2);
 
     this.px = lerp(this.px, this.tpx, 0.045);
     this.py = lerp(this.py, this.tpy, 0.045);
@@ -112,10 +138,16 @@ class Experience {
     }
     this.plate.update(this.p);
 
-    this.stage.render({
-      time: now/1000, p: this.p, vel: this.vel,
-      px: this.px, py: this.py, plate: !!this.stagePlate
-    }, dt);
+    // Nothing is drawn once the hero has faded out or the tab is hidden — the
+    // two G-buffer passes are the most expensive thing on the page.
+    const off = (scrollY - this.cineLength) / (this.baseH * 0.9) >= 1;
+    this.rendering = !off && !document.hidden;
+    if(this.rendering){
+      this.stage.render({
+        time: now/1000, p: this.p, vel: this.vel,
+        px: this.px, py: this.py, plate: !!this.stagePlate
+      }, dt);
+    }
     this.paintDOM();
 
     requestAnimationFrame(t => this.frame(t));
@@ -153,7 +185,13 @@ class Experience {
     // scroll hint
     // Hold the cue long enough to be read, then retire it as soon as the
     // visitor is clearly moving. Full opacity until 1.5% in, gone by 9%.
-    this.hint.style.opacity = ((1 - ease(seg(p, 0.015, 0.090))) * alive).toFixed(3);
+    // The film now plays by itself, so the cue answers to the visitor's
+    // scrolling rather than to the timeline — otherwise it would retire on its
+    // own a second in, before anyone had read it. It still clears out at the
+    // brand beat so it never competes with the call to action.
+    const scrolled = ease(clamp(scrollY / (this.baseH * 0.35), 0, 1));
+    this.hint.style.opacity =
+      ((1 - scrolled) * (1 - ease(seg(p, 0.86, 0.95))) * alive).toFixed(3);
 
     // progress rule
     this.progress.style.setProperty('--w', (p*100).toFixed(2) + '%');

@@ -15,14 +15,17 @@ const Lang = {
   cur: 'no',
   set(l){
     this.cur = l;
-    for(const el of site.querySelectorAll('[data-no]')){
+    document.documentElement.lang = l === 'no' ? 'nb' : 'en';
+    // The hero cues and the nav carry copy as well, so this reaches the whole
+    // document — not just #site. It only ever writes textContent.
+    for(const el of document.querySelectorAll('[data-no]')){
       const v = el.dataset[l];
       if(v !== undefined) el.textContent = v;
     }
-    for(const el of site.querySelectorAll('[data-ph-no]')){
+    for(const el of document.querySelectorAll('[data-ph-no]')){
       el.placeholder = l === 'no' ? el.dataset.phNo : el.dataset.phEn;
     }
-    for(const b of site.querySelectorAll('.lang button')){
+    for(const b of document.querySelectorAll('.lang button')){
       const on = b.dataset.lang === l;
       b.classList.toggle('on', on);
       b.setAttribute('aria-pressed', String(on));
@@ -152,7 +155,7 @@ function form(){
 clearFilms();
 materials();
 Lang.set('no');
-for(const b of site.querySelectorAll('.lang button'))
+for(const b of document.querySelectorAll('.lang button'))
   b.addEventListener('click', () => Lang.set(b.dataset.lang));
 reveals();
 anchors();
