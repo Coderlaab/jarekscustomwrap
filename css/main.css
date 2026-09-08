@@ -160,6 +160,24 @@ body.no-webgl #fallback{ display:block; }
 #nav .lang button.on{ color:var(--ink); }
 #nav .lang span{ color:rgba(242,243,246,.18); }
 
+/* Developer signature — one element with two homes. It belongs in the header's
+   utility cluster beside the language switch: one step smaller and much dimmer
+   than the navigation, and set in sentence case among tracked capitals so it
+   reads as meta rather than as another nav item. Below 640px the phone header
+   is full, so js/homepage.js moves the same node down to the footer beside the
+   copyright. It is repositioned, never duplicated. */
+#nav .util{ display:flex; align-items:center; gap:clamp(.9rem,2vw,1.7rem); }
+.by{
+  color:rgba(242,243,246,.26); text-decoration:none; white-space:nowrap;
+  font-size:.6rem; letter-spacing:.02em; font-weight:400;
+  transition:color .3s;
+}
+.by:hover, .by:focus-visible{ color:var(--ink-soft); }
+/* in the footer it sits among larger type, so it takes the legal line's scale
+   and stays one step above it in contrast — still below the footer links */
+#foot .by{ font-size:.82rem; letter-spacing:normal; color:var(--bone-3); }
+#foot .by:hover, #foot .by:focus-visible{ color:var(--bone-2); }
+
 .skip{
   position:fixed; top:-100px; left:1rem; z-index:99; padding:.8rem 1.2rem;
   background:var(--ink); color:var(--void); font-size:.8rem; text-decoration:none;

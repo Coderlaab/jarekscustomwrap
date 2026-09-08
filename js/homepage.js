@@ -2,8 +2,9 @@
 //  Homepage behaviour — everything BELOW the cinematic hero.
 //
 //  This module deliberately touches nothing the hero owns. It does not read or
-//  write #stage, #type, #progress, #nav or the scroll timeline; main.js
-//  remains the only owner of those. Scope is #site and nothing else.
+//  write #stage, #type, #progress or the scroll timeline; main.js remains the
+//  only owner of those. It reaches #nav in exactly two places — the language
+//  switch and the developer signature — and only to move or relabel nodes.
 // ---------------------------------------------------------------------------
 import { CLEAR, COLOUR, GROUPS } from './films.js';
 
@@ -137,6 +138,28 @@ function anchors(){
   }
 }
 
+/* ------------------------------------------------------ developer credit --- */
+// One element, two homes. The signature belongs in the header's utility
+// cluster, but the phone header is already full, so below 640px the same node
+// moves to the footer beside the copyright. Moved, never duplicated.
+function signature(){
+  const by   = document.querySelector('.by');
+  const slot = document.querySelector('#nav .util');
+  const legal = document.querySelector('#foot .f-legal');
+  if(!by || !slot || !legal) return;
+
+  const small = matchMedia('(max-width:640px)');
+  const place = () => {
+    if(small.matches){
+      if(by.previousElementSibling !== legal) legal.after(by);
+    } else if(by.parentNode !== slot){
+      slot.prepend(by);
+    }
+  };
+  place();
+  small.addEventListener('change', place);
+}
+
 /* ------------------------------------------------------------------ form --- */
 function form(){
   const f = document.getElementById('quote');
@@ -158,3 +181,4 @@ for(const b of document.querySelectorAll('.lang button'))
 reveals();
 anchors();
 form();
+signature();
