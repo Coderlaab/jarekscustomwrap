@@ -73,7 +73,6 @@ function materials(){
   const sheen   = document.getElementById('film-sheen');
   const nameEl  = document.getElementById('film-name');
   const metaEl  = document.getElementById('film-meta');
-  const idxEl   = document.getElementById('film-index');
   const wrap    = document.getElementById('film-stage');
   if(!list) return;
 
@@ -107,7 +106,6 @@ function materials(){
     surface.dataset.finish = f.group;
     nameEl.textContent = f.name;
     metaEl.textContent = Lang.cur === 'no' ? GROUPS[f.group].no : GROUPS[f.group].en;
-    idxEl.textContent  = String(COLOUR.indexOf(f) + 1).padStart(2, '0');
     for(const b of list.querySelectorAll('.film'))
       b.classList.toggle('on', b.dataset.slug === f.slug);
   }

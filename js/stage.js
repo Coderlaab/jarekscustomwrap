@@ -122,9 +122,7 @@ export class Stage {
   // The film renders below native so it can hold its frame rate. The held
   // closing frame renders 1:1 with the display instead: motion hides
   // resampling, a still frame does not, and it sits beside HTML type that is
-  // always rasterised at native. Anything short of 1:1 reads as soft next to
-  // it — at 87% of native the peak edge contrast on the bodywork measured 21%
-  // lower than at 1:1.
+  // always rasterised at native.
   setStill(on){
     if(this.still === on) return;
     this.still = on;

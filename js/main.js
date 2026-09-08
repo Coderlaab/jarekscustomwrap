@@ -140,7 +140,7 @@ class Experience {
     // Nothing is drawn once the hero has faded out or the tab is hidden — the
     // two G-buffer passes are the most expensive thing on the page.
     // Once the film has finished the camera is frozen, so the frame is redrawn
-    // at near-native resolution and only every third tick — a still image that
+    // 1:1 with the display and only every third tick — a still image that
     // costs a third of a moving one.
     if(this.p >= 1 && !this.still){
       this.still = true; this.stage.setStill(true);
