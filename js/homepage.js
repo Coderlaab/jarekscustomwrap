@@ -2,7 +2,7 @@
 //  Homepage behaviour — everything BELOW the cinematic hero.
 //
 //  This module deliberately touches nothing the hero owns. It does not read or
-//  write #stage, #type, #hint, #progress, #nav or the scroll timeline; main.js
+//  write #stage, #type, #progress, #nav or the scroll timeline; main.js
 //  remains the only owner of those. Scope is #site and nothing else.
 // ---------------------------------------------------------------------------
 import { CLEAR, COLOUR, GROUPS } from './films.js';

@@ -39,13 +39,21 @@ const FP = [0.88, 0.86, 0.74, 0.56, 0.56, 0.68, 0.88, 1.22];
 // other beat is zero and unaffected.
 const TP = [0, 0, 0, 0, 0, 0, 0, 0.12];
 
+// The same two corrections for landscape. Only the final beat is non-neutral:
+// at 38 deg the nose sat about 1% past the right edge on every desktop aspect,
+// with 4% of slack on the left. A 3.5% wider lens and the same nudge toward the
+// nose balances it. Every other keyframe is 1.0 / 0, so nothing else moves.
+const FL = [1, 1, 1, 1, 1, 1, 1, 1.035];
+const TL = [0, 0, 0, 0, 0, 0, 0, 0.125];
+
 const sat = x => Math.min(1, Math.max(0, x));
 const easeIO = t => t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;
 const ease   = t => { t = sat(t); return t*t*(3-2*t); };
 const mix3 = (a, b, t) => [a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t, a[2]+(b[2]-a[2])*t];
 
 export function camAt(p, time, px, py, aspect){
-  let ro = P[7].slice(), ta = T[7].slice(), fov = F[7], fp = FP[7], tp = TP[7];
+  let ro = P[7].slice(), ta = T[7].slice(), fov = F[7];
+  let fp = FP[7], tp = TP[7], fl = FL[7], tl = TL[7];
   for(let i = 0; i < 7; i++){
     if(p <= K[i+1] || i === 6){
       const t = easeIO(sat((p - K[i]) / Math.max(K[i+1] - K[i], 1e-4)));
@@ -54,6 +62,8 @@ export function camAt(p, time, px, py, aspect){
       fov = F[i] + (F[i+1] - F[i]) * t;
       fp  = FP[i] + (FP[i+1] - FP[i]) * t;
       tp  = TP[i] + (TP[i+1] - TP[i]) * t;
+      fl  = FL[i] + (FL[i+1] - FL[i]) * t;
+      tl  = TL[i] + (TL[i+1] - TL[i]) * t;
       break;
     }
   }
@@ -61,8 +71,8 @@ export function camAt(p, time, px, py, aspect){
   // How portrait the screen is: 0 at 1.10 and wider, 1 at 0.55 and narrower.
   // Every landscape desktop lands on 0, so nothing below this line changes it.
   const port = aspect === undefined ? 0 : sat((1.10 - aspect) / 0.55);
-  fov   *= 1 + (fp - 1) * port;
-  ta[0] += tp * port;
+  fov   *= fl + (fp - fl) * port;
+  ta[0] += tl + (tp - tl) * port;
 
   // Living camera: a slow breath plus pointer parallax, so a stopped scroll
   // settles rather than freezing.

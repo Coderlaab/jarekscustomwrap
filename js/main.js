@@ -188,7 +188,6 @@ class Experience {
     const lb = ease(seg(p, 0.0, 0.06)) * (1 - ease(seg(p, CH.brand[0], 0.99)));
     this.bars.style.setProperty('--lb', (lb * 5.4).toFixed(3) + 'vh');
 
-    // scroll hint
     // Hold the cue long enough to be read, then retire it as soon as the
     // visitor is clearly moving. Full opacity until 1.5% in, gone by 9%.
     this.progress.style.setProperty('--w', (p*100).toFixed(2) + '%');
