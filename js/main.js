@@ -27,7 +27,7 @@ const CH = {                       // chapter boundaries on the 0..1 master
 const DUR_S       = 16.0;   // passive viewing duration of the whole arc
 const RATE        = 1 / DUR_S;
 const MAX_MULT    = 2.5;    // the most that scrolling may accelerate playback
-const SKIP_MULT   = 8.0;    // once the visitor has clearly left the hero
+const SKIP_MULT   = 4.75;   // once the visitor has clearly left the hero
 const ENERGY_FULL = 900;    // px of recent scrolling that means "full speed"
 const ENERGY_TAU  = 0.45;   // seconds; how fast that intent decays
 
@@ -50,7 +50,6 @@ class Experience {
     this.cues     = [...document.querySelectorAll('.cue')];
     this.nav      = document.getElementById('nav');
     this.site     = document.getElementById('site');
-    this.hint     = document.getElementById('hint');
     this.progress = document.getElementById('progress');
     this.bars     = document.getElementById('bars');
 
@@ -140,8 +139,15 @@ class Experience {
 
     // Nothing is drawn once the hero has faded out or the tab is hidden — the
     // two G-buffer passes are the most expensive thing on the page.
+    // Once the film has finished the camera is frozen, so the frame is redrawn
+    // at near-native resolution and only every third tick — a still image that
+    // costs a third of a moving one.
+    if(this.p >= 1 && !this.still){ this.still = true; this.stage.setStill(true); }
+    this.tick = (this.tick || 0) + 1;
+    const throttled = this.still && (this.tick % 3 !== 0);
+
     const off = (scrollY - this.cineLength) / (this.baseH * 0.9) >= 1;
-    this.rendering = !off && !document.hidden;
+    this.rendering = !off && !document.hidden && !throttled;
     if(this.rendering){
       this.stage.render({
         time: now/1000, p: this.p, vel: this.vel,
@@ -185,15 +191,6 @@ class Experience {
     // scroll hint
     // Hold the cue long enough to be read, then retire it as soon as the
     // visitor is clearly moving. Full opacity until 1.5% in, gone by 9%.
-    // The film now plays by itself, so the cue answers to the visitor's
-    // scrolling rather than to the timeline — otherwise it would retire on its
-    // own a second in, before anyone had read it. It still clears out at the
-    // brand beat so it never competes with the call to action.
-    const scrolled = ease(clamp(scrollY / (this.baseH * 0.35), 0, 1));
-    this.hint.style.opacity =
-      ((1 - scrolled) * (1 - ease(seg(p, 0.86, 0.95))) * alive).toFixed(3);
-
-    // progress rule
     this.progress.style.setProperty('--w', (p*100).toFixed(2) + '%');
     this.progress.style.opacity = (ease(seg(p,0.01,0.05)) * (1 - ease(seg(p, 0.93, 1.0))) * alive).toFixed(3);
 

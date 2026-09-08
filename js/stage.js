@@ -31,6 +31,7 @@ export class Stage {
     this.scale = 0.78;
     this.quality = 1.0;
     this.frameTimes = [];
+    this.still = false;      // the closing frame is held, so it can afford more
 
     this._build();
     this.resize();
@@ -119,11 +120,23 @@ export class Stage {
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   }
 
-  resize(){
+  // The film renders below native so it can hold its frame rate. The closing
+  // frame is static, so it is rendered near-native instead — a moving image
+  // hides resampling, a held one does not. On a dpr-3 phone the playing scale
+  // is 45% of native; this brings the final hold to ~87%.
+  setStill(on){
+    if(this.still === on) return;
+    this.still = on;
+    this.resize(true);
+  }
+
+  resize(force){
     if(!this.ok) return;
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.75);
-    const w = Math.max(1, Math.round(window.innerWidth  * dpr * this.scale));
-    const h = Math.max(1, Math.round(window.innerHeight * dpr * this.scale));
+    const cap = this.still ? 2.6 : 1.75;
+    const dpr = Math.min(window.devicePixelRatio || 1, cap);
+    const sc = this.still ? 1.0 : this.scale;
+    const w = Math.max(1, Math.round(window.innerWidth  * dpr * sc));
+    const h = Math.max(1, Math.round(window.innerHeight * dpr * sc));
     if(this.canvas.width === w && this.canvas.height === h) return;
     this.canvas.width = w; this.canvas.height = h;
     this._sizeGBuffer(this.fbo[0], w, h);
@@ -132,6 +145,9 @@ export class Stage {
 
   // Keep the frame budget honest: drop render scale if we fall behind.
   _adapt(dt){
+    // Frame rate does not matter once nothing is moving, so the scaler must not
+    // be allowed to degrade the held frame.
+    if(this.still) return;
     this.frameTimes.push(dt);
     if(this.frameTimes.length < 45) return;
     const avg = this.frameTimes.reduce((a,b)=>a+b,0) / this.frameTimes.length;

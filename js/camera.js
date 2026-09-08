@@ -31,14 +31,21 @@ const K = [0.0, C1, C2, C3, C4, C5, C6, 1.0];
 // space. These tighten each keyframe back to the composition it was cut for:
 // the close beats hardest, the two hero-wide beats barely at all so the whole
 // car still fits.
-const FP = [0.88, 0.86, 0.74, 0.56, 0.56, 0.68, 0.88, 0.90];
+const FP = [0.88, 0.86, 0.74, 0.56, 0.56, 0.68, 0.88, 1.22];
+
+// Portrait-only lateral aim, per keyframe. The final beat looks in from the
+// front quarter, so the nose sits further to the right than the tail sits to
+// the left. Nudging the aim toward the nose balances the two margins; every
+// other beat is zero and unaffected.
+const TP = [0, 0, 0, 0, 0, 0, 0, 0.12];
 
 const sat = x => Math.min(1, Math.max(0, x));
 const easeIO = t => t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;
+const ease   = t => { t = sat(t); return t*t*(3-2*t); };
 const mix3 = (a, b, t) => [a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t, a[2]+(b[2]-a[2])*t];
 
 export function camAt(p, time, px, py, aspect){
-  let ro = P[7].slice(), ta = T[7].slice(), fov = F[7], fp = FP[7];
+  let ro = P[7].slice(), ta = T[7].slice(), fov = F[7], fp = FP[7], tp = TP[7];
   for(let i = 0; i < 7; i++){
     if(p <= K[i+1] || i === 6){
       const t = easeIO(sat((p - K[i]) / Math.max(K[i+1] - K[i], 1e-4)));
@@ -46,6 +53,7 @@ export function camAt(p, time, px, py, aspect){
       ta = mix3(T[i], T[i+1], t);
       fov = F[i] + (F[i+1] - F[i]) * t;
       fp  = FP[i] + (FP[i+1] - FP[i]) * t;
+      tp  = TP[i] + (TP[i+1] - TP[i]) * t;
       break;
     }
   }
@@ -53,7 +61,8 @@ export function camAt(p, time, px, py, aspect){
   // How portrait the screen is: 0 at 1.10 and wider, 1 at 0.55 and narrower.
   // Every landscape desktop lands on 0, so nothing below this line changes it.
   const port = aspect === undefined ? 0 : sat((1.10 - aspect) / 0.55);
-  fov *= 1 + (fp - 1) * port;
+  fov   *= 1 + (fp - 1) * port;
+  ta[0] += tp * port;
 
   // Living camera: a slow breath plus pointer parallax, so a stopped scroll
   // settles rather than freezing.
@@ -61,13 +70,19 @@ export function camAt(p, time, px, py, aspect){
   const d = Math.hypot(ro[0]-ta[0], ro[1]-ta[1], ro[2]-ta[2]);
   // Parallax is reduced on a phone: the drift is a mouse affordance, and on a
   // narrow frame the same amplitude reads as the camera wobbling.
-  const amp = (0.35 + 0.65 * sat(d / 4.0)) * (1 - 0.45 * port);
+  //
+  // Both the breath and the parallax are damped to nothing as the film reaches
+  // its end, so the closing frame is a still photograph rather than something
+  // that keeps drifting. On a touch device the parallax offset would otherwise
+  // stay parked wherever the last finger was.
+  const settle = ease(sat((p - 0.965) / 0.035));
+  const amp = (0.35 + 0.65 * sat(d / 4.0)) * (1 - 0.45 * port) * (1 - settle);
   ro[0] += Math.sin(br)*0.042*amp;      ro[1] += Math.cos(br*0.83)*0.026*amp;
   ro[2] += Math.sin(br*0.62)*0.036*amp;
   ro[0] += px * 0.15 * amp;             ro[1] += py * 0.10 * amp;
   ta[0] += px * 0.040 * amp;            ta[1] += py * 0.028 * amp;
 
-  const roll = Math.sin(time*0.11) * 0.006 + px * 0.010;
+  const roll = (Math.sin(time*0.11) * 0.006 + px * 0.010) * (1 - settle);
   return { ro, ta, fov, roll };
 }
 
@@ -135,8 +150,7 @@ export function viewProj(cam, W, H, biasY, mirror){
 
 // The vertical framing bias the fragment shader applies to uv.y.
 export function framingBias(p, W, H){
-  const ease = t => t*t*(3-2*t);
   const seg  = (x,a,b) => sat((x-a)/(b-a));
   const tall = sat((1.10 - W/H) * 1.25);
-  return 0.235 * tall + 0.335 * ease(seg(p, C6, 0.99));
+  return 0.235 * tall + (0.335 + 0.125 * tall) * ease(seg(p, C6, 0.99));
 }

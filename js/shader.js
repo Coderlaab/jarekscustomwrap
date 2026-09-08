@@ -390,7 +390,7 @@ void main(){
   // down — hard on a tall phone, and harder still at the brand beat where the
   // wordmark needs the whole top of the frame.
   float tall = sat((1.10 - uRes.x/uRes.y) * 1.25);
-  uv.y += 0.235 * tall + 0.335 * ease(seg(uP, C6, 0.99));
+  uv.y += 0.235 * tall + (0.335 + 0.125 * tall) * ease(seg(uP, C6, 0.99));
 
   vec3 fwd = normalize(uCamTa - uCamRo);
   vec3 rgt = normalize(cross(fwd, vec3(0.0,1.0,0.0)));
