@@ -17,7 +17,6 @@ uniform float uTime;
 uniform float uP;        // master timeline 0..1 (scroll driven, smoothed)
 uniform float uVel;      // scroll velocity, signed
 uniform vec2  uPointer;  // -1..1 parallax
-uniform float uQuality;  // 1.0 full, 0.6 reduced
 uniform float uPlate;    // 1.0 = supplied footage is live; render atmosphere only
 
 // G-buffers rasterised from the vehicle mesh. uGPos.rgb is world position and

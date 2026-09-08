@@ -29,7 +29,6 @@ export class Stage {
     gl.getExtension('OES_texture_float_linear');
 
     this.scale = 0.78;
-    this.quality = 1.0;
     this.frameTimes = [];
     this.still = false;      // the closing frame is held, so it can afford more
 
@@ -73,7 +72,7 @@ export class Stage {
     this.cProg = this._link(VERT, FRAG, 'composite', ['aPos']);
     gl.useProgram(this.cProg);
     this.u = {};
-    for(const n of ['uRes','uTime','uP','uVel','uPointer','uQuality','uPlate',
+    for(const n of ['uRes','uTime','uP','uVel','uPointer','uPlate',
                     'uGPos','uGNrm','uRPos','uRNrm',
                     'uCamRo','uCamTa','uCamFov','uCamRoll'])
       this.u[n] = gl.getUniformLocation(this.cProg, n);
@@ -120,27 +119,38 @@ export class Stage {
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   }
 
-  // The film renders below native so it can hold its frame rate. The closing
-  // frame is static, so it is rendered near-native instead — a moving image
-  // hides resampling, a held one does not. On a dpr-3 phone the playing scale
-  // is 45% of native; this brings the final hold to ~87%.
+  // The film renders below native so it can hold its frame rate. The held
+  // closing frame renders 1:1 with the display instead: motion hides
+  // resampling, a still frame does not, and it sits beside HTML type that is
+  // always rasterised at native. Anything short of 1:1 reads as soft next to
+  // it — at 87% of native the peak edge contrast on the bodywork measured 21%
+  // lower than at 1:1.
   setStill(on){
     if(this.still === on) return;
     this.still = on;
-    this.resize(true);
+    this.resize();
   }
 
-  resize(force){
+  // The buffer is sized from the canvas's own box, never from the window. On
+  // iOS the URL bar moves innerHeight by ~13% while the fixed stage keeps the
+  // layout viewport; the browser resolves the difference by stretching the
+  // buffer into the box, and no amount of extra resolution undoes a resample.
+  resize(){
     if(!this.ok) return;
-    const cap = this.still ? 2.6 : 1.75;
-    const dpr = Math.min(window.devicePixelRatio || 1, cap);
+    const gl = this.gl;
+    const dpr = this.still ? (window.devicePixelRatio || 1)
+                           : Math.min(window.devicePixelRatio || 1, 1.75);
     const sc = this.still ? 1.0 : this.scale;
-    const w = Math.max(1, Math.round(window.innerWidth  * dpr * sc));
-    const h = Math.max(1, Math.round(window.innerHeight * dpr * sc));
+    const cw = this.canvas.clientWidth  || window.innerWidth;
+    const ch = this.canvas.clientHeight || window.innerHeight;
+    const w = Math.max(1, Math.round(cw * dpr * sc));
+    const h = Math.max(1, Math.round(ch * dpr * sc));
     if(this.canvas.width === w && this.canvas.height === h) return;
     this.canvas.width = w; this.canvas.height = h;
-    this._sizeGBuffer(this.fbo[0], w, h);
-    this._sizeGBuffer(this.fbo[1], w, h);
+    // A phone may grant less than was asked for. Everything downstream reads
+    // drawingBuffer*, so the frame stays correctly composed either way.
+    this._sizeGBuffer(this.fbo[0], gl.drawingBufferWidth, gl.drawingBufferHeight);
+    this._sizeGBuffer(this.fbo[1], gl.drawingBufferWidth, gl.drawingBufferHeight);
   }
 
   // Keep the frame budget honest: drop render scale if we fall behind.
@@ -154,11 +164,9 @@ export class Stage {
     this.frameTimes.length = 0;
     if(avg > 26 && this.scale > 0.45){
       this.scale = Math.max(0.45, this.scale - 0.10);
-      this.quality = Math.max(0.0, this.quality - 0.25);
       this.resize();
     } else if(avg < 13 && this.scale < 0.9){
       this.scale = Math.min(0.9, this.scale + 0.05);
-      this.quality = Math.min(1.0, this.quality + 0.1);
       this.resize();
     }
   }
@@ -187,15 +195,15 @@ export class Stage {
     const gl = this.gl, u = this.u;
     this._adapt(dt);
 
-    const cam  = camAt(state.p, state.time, state.px, state.py,
-                       this.canvas.width / this.canvas.height);
-    const bias = framingBias(state.p, this.canvas.width, this.canvas.height);
+    const bw = gl.drawingBufferWidth, bh = gl.drawingBufferHeight;
+    const cam  = camAt(state.p, state.time, state.px, state.py, bw / bh);
+    const bias = framingBias(state.p, bw, bh);
 
     this._gbufferPass(this.fbo[0], cam, bias, false);
     this._gbufferPass(this.fbo[1], cam, bias, true);
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+    gl.viewport(0, 0, bw, bh);
     gl.useProgram(this.cProg);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.quad);
@@ -207,12 +215,11 @@ export class Stage {
     gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D, this.fbo[1].pos);
     gl.activeTexture(gl.TEXTURE3); gl.bindTexture(gl.TEXTURE_2D, this.fbo[1].nrm);
 
-    gl.uniform2f(u.uRes, this.canvas.width, this.canvas.height);
+    gl.uniform2f(u.uRes, bw, bh);
     gl.uniform1f(u.uTime, state.time);
     gl.uniform1f(u.uP, state.p);
     gl.uniform1f(u.uVel, state.vel);
     gl.uniform2f(u.uPointer, state.px, state.py);
-    gl.uniform1f(u.uQuality, this.quality);
     gl.uniform1f(u.uPlate, state.plate ? 1 : 0);
     gl.uniform3f(u.uCamRo, cam.ro[0], cam.ro[1], cam.ro[2]);
     gl.uniform3f(u.uCamTa, cam.ta[0], cam.ta[1], cam.ta[2]);

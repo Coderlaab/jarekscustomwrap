@@ -142,7 +142,10 @@ class Experience {
     // Once the film has finished the camera is frozen, so the frame is redrawn
     // at near-native resolution and only every third tick — a still image that
     // costs a third of a moving one.
-    if(this.p >= 1 && !this.still){ this.still = true; this.stage.setStill(true); }
+    if(this.p >= 1 && !this.still){
+      this.still = true; this.stage.setStill(true);
+      this.tick = -1;          // the resized buffer is blank; draw it at once
+    }
     this.tick = (this.tick || 0) + 1;
     const throttled = this.still && (this.tick % 3 !== 0);
 
@@ -188,8 +191,6 @@ class Experience {
     const lb = ease(seg(p, 0.0, 0.06)) * (1 - ease(seg(p, CH.brand[0], 0.99)));
     this.bars.style.setProperty('--lb', (lb * 5.4).toFixed(3) + 'vh');
 
-    // Hold the cue long enough to be read, then retire it as soon as the
-    // visitor is clearly moving. Full opacity until 1.5% in, gone by 9%.
     this.progress.style.setProperty('--w', (p*100).toFixed(2) + '%');
     this.progress.style.opacity = (ease(seg(p,0.01,0.05)) * (1 - ease(seg(p, 0.93, 1.0))) * alive).toFixed(3);
 
